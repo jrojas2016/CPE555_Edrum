@@ -1,7 +1,7 @@
 '''
 #CPE555 Raspberry Pi Project
 #Title: Any-Surface Electronic Drum Kit
-#by: Jorge Rojas and Patel
+#by: Jorge Rojas
 
 Description:
         Electronic drum kit triggered by vibration sensors going through ADS1115 ADC.
@@ -16,7 +16,7 @@ References:
 
 import sys
 import time as t
-import thread as th     #used to parallelize each channel on the ADS1115
+#import thread as th     #used to parallelize each channel on the ADS1115
 import signal as s
 import pygame as pyg
 import RPi.GPIO as GPIO
@@ -73,7 +73,7 @@ def playDrum(drum_type):
         elif drum_type == 'kick':
                 pyg.mixer.music.load('k4.wav')
         elif drum_type == 'hihat':
-                pyg.mixer.music.load('hh3open.wav')
+                pyg.mixer.music.load('hh2open.wav')
         elif drum_type == 'tom':
                 pyg.mixer.music.load('ta1.wav')
         pyg.mixer.music.play()
@@ -108,8 +108,9 @@ def sensorTriggered(channel, drum_type, pin, delay):
         print ch_value
 
         if ch_value > piezo_threshold:
-                blink(pin, delay)
                 playDrum(drum_type)
+                blink(pin, delay)
+                
 
 ########################## MAIN PROGRAM ################################################
 
@@ -117,11 +118,16 @@ if __name__ == '__main__':
         #channel_values = []     #channel values
 
         while(True):
-                try:
-                        th.start_new_thread(sensorTriggered, (0, 'snare', RED_PIN, 0.25))
-                        th.start_new_thread(sensorTriggered, (1, 'hihat', BLUE_PIN, 0.25))
-                except:
-                        print "Error: unable to start thread"
+
+                sensorTriggered(0, 'snare', RED_LED, 0.25)
+                sensorTriggered(1, 'hihat', BLUE_LED, 0.25)
+
+                #TODO: Implement Threading for delay issue
+                #try:
+                        #th.start_new_thread(sensorTriggered, (0, 'snare', RED_LED, 0.25))
+                        #th.start_new_thread(sensorTriggered, (1, 'hihat', BLUE_LED, 0.25))
+                #except:
+                        #print "Error: unable to start thread"
 
 
                 #CODE FOR SENSOR TRIGGER WITHOUT THREADING
